@@ -5,9 +5,11 @@ import numpy as np
 import time
 start_time = time.time()
 
+options = core.read_config('config.ini')
+print('Caricamento impostazioni')
 #Leggo l'immagine
 print('Lettura immagine di riferimento')
-img_riferimento = Image.open('0_orig.JPG', 'r')
+img_riferimento = Image.open(options['imagePath'] + '0.JPG', 'r')
 
 #Converto in scala di grigi
 img_riferimento_grigio_matrice = core.img_in_matrice(img_riferimento)
@@ -33,10 +35,10 @@ iniettore_riferimento_pulito = core.calcola_intensita(intensita)
 img_diff = img_diff_grigio_matrice = differenza = [1, 2, 3, 4, 5]
 numero = indice = '' + "\n"
 
-for count in range(1,5):
-    print('Caricamento immagine ' + str(count) + '_orig.JPG')
+for count in range(1,(int(options['imageNumber']) + 1)):
+    print('Caricamento immagine ' + str(count) + '.JPG')
     #leggo l'immagine
-    img_diff[count] = Image.open(str(count) + '_orig.JPG', 'r')
+    img_diff[count] = Image.open(options['imagePath'] + str(count) + '.JPG', 'r')
     #converto in scala di grigi
     img_diff_grigio_matrice[count] = core.img_in_matrice(img_diff[count])
     #faccio la differenza
@@ -49,12 +51,12 @@ for count in range(1,5):
     for x in range(size_x):
         for y in range(size_y):
             #cerco di eliminare il rumore
-            if img_diff_grigio_matrice[count][x,y] >= 120:
+            if img_diff_grigio_matrice[count][x,y] >= int(options['rumour']):
                 img_diff_grigio_matrice[count][x,y]=0
             #sommo le intensita
             intensita[img_diff_grigio_matrice[count][x,y]]+=1
 
-    core.salva_immagine_da_array(differenza[count], str(count) + '_differenza.JPG')
+    core.salva_immagine_da_array(differenza[count], options['imagePath'] + str(count) + '_differenza.JPG')
     numero += "Numero Sporcamento Differenza " + str(count) + ": " + core.calcola_intensita(intensita) + "\n"
     indice += "Indice Sporcamento " + str(count) + ": " + core.indice_sporcamento(iniettore_riferimento_pulito, core.calcola_intensita(intensita)) + "\n"
 
