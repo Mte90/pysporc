@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 from core import Sporcamento as core
+from core import str_to_bool
 from PIL import Image
 import numpy as np
 import time
@@ -7,11 +8,10 @@ start_time = time.time()
 #Lettura impostazioni
 options = core.read_config('config.ini')
 print('Caricamento impostazioni')
-if bool(options['onlyWebcam']) == True:
+webcam = prefix = ''
+if str_to_bool(options['onlyWebcam']) == True:
     prefix = '_webcam'
     webcam = core.init_webcam(options)
-else:
-    webcam = prefix = ''
 #Leggo l'immagine
 print('Lettura immagine di riferimento')
 core.scatta_foto(0, options, webcam)

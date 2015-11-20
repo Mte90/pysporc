@@ -61,8 +61,16 @@ class Sporcamento():
         return cam
 
     def scatta_foto(number, options, webcam):
-        if bool(options['onlyWebcam']) == True:
+        if str_to_bool(options['onlyWebcam']) == True:
             if number != 0:
                 sleep(int(options['sleep']))
             img = webcam.get_image()
             pygame.image.save(img,options['imagePath'] + str(number) + '_webcam.JPG')
+
+def str_to_bool(s):
+    if s == 'True':
+        return True
+    elif s == 'False':
+        return False
+    else:
+        raise ValueError
