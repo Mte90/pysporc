@@ -1,5 +1,7 @@
 import numpy as np
 from PIL import Image
+import pygame.camera, pygame.image
+from time import sleep
 
 class Sporcamento():
 
@@ -7,18 +9,12 @@ class Sporcamento():
         options = {}
         f = open(filename)
         for line in f:
-            # First, remove comments:
             if '#' in line:
-                # split on comment char, keep only the part before
                 line, comment = line.split('#', 1)
-            # Second, find lines with an option=value:
             if '=' in line:
-                # split on option char:
                 option, value = line.split('=', 1)
-                # strip spaces:
                 option = option.strip()
                 value = value.strip()
-                # store in dictionary:
                 options[option] = value
         f.close()
         return options
@@ -57,3 +53,16 @@ class Sporcamento():
 
     def indice_sporcamento(riferimento, intensita):
         return str((int(riferimento) + int(intensita))/int(riferimento))
+
+    def init_webcam(options):
+        pygame.camera.init()
+        cam = pygame.camera.Camera("/dev/video0",(int(options['imageWidth']),int(options['imageHeight'])))
+        cam.start()
+        return cam
+
+    def scatta_foto(number, options, webcam):
+        if bool(options['onlyWebcam']) == True:
+            if number != 0:
+                sleep(int(options['sleep']))
+            img = webcam.get_image()
+            pygame.image.save(img,options['imagePath'] + str(number) + '_webcam.JPG')

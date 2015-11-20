@@ -1,3 +1,3 @@
 #!/usr/bin/bash
 
-apt-get install python3-numpy python3-pil
+apt-get install python3-numpy python3-pil python3-opencv
