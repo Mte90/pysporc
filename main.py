@@ -13,60 +13,58 @@ if str_to_bool(options['onlyWebcam']) == True:
     prefix = '_webcam'
     webcam = core.init_webcam(options)
     options['imagePath'] += 'webcam/'
-#Leggo l'immagine
-print('Lettura immagine di riferimento')
-if str_to_bool(options['onlyWebcam']) == True:
-    core.scatta_foto(0, options, webcam)
-img_riferimento = Image.open(options['imagePath'] + '0' + prefix + '.JPG', 'r')
-#Converto in scala di grigi
-img_riferimento_grigio_matrice = core.img_in_matrice(img_riferimento)
-pixel_riferimento_totali, intensita_riferimento = core.conta_bin_e_range(img_riferimento_grigio_matrice)
-#tanto le dimensioni sono le stesse per tutte
-size_x = img_riferimento_grigio_matrice.shape[0]
-size_y = img_riferimento_grigio_matrice.shape[1]
-#intensita reset
-intensita_reset = np.array(range(0, 255))
-for i in intensita_reset:
-    intensita_reset[i] = 0
-intensita = intensita_reset
-#cerco di eliminare il rumore
-for x in range(size_x):
-    for y in range(size_y):
-        #sommo le intensita
-        intensita[img_riferimento_grigio_matrice[x,y]]+=1
+else:
+    output_folder = options['imagePath'] + 'output/'
+    options['imagePath'] += 'sporc/'
 
-iniettore_riferimento_pulito = core.calcola_intensita(intensita)
+#Leggo l'immagine
+#print('Lettura immagine di riferimento')
+#if str_to_bool(options['onlyWebcam']) == True:
+#    core.scatta_foto(0, options, webcam)
+#img_riferimento = Image.open(options['imagePath'] + '0' + prefix + '.jpg', 'r')
+##Converto in scala di grigi
+#img_riferimento_grigio_matrice = core.img_in_matrice(img_riferimento)
+#pixel_riferimento_totali, intensita_riferimento = core.conta_bin_e_range(img_riferimento_grigio_matrice)
+
+#tanto le dimensioni sono le stesse per tutte
+size_x = int(options['imageWidth'])
+size_y = int(options['imageHeight'])
+
+#iniettore_riferimento_pulito = core.calcola_intensita(intensita)
 #inizializzo i valori
-img_diff = img_diff_grigio_matrice = differenza = [1, 2, 3, 4, 5]
+img_diff = ''
+img_grigio_matrice = {}
+img_differenza = list(range(1,(int(options['imageNumber']))))
 numero = indice = '' + "\n"
 
-for count in range(1,(int(options['imageNumber']) + 1)):
-    print('Caricamento immagine ' + str(count) + prefix + '.JPG')
-    if str_to_bool(options['onlyWebcam']) == True:
-        print(' Attesa per il nuovo scatto')
-    #leggo l'immagine
-    if str_to_bool(options['onlyWebcam']) == True:
-        core.scatta_foto(int(count), options, webcam)
-    img_diff[count] = Image.open(options['imagePath'] + str(count) + prefix + '.JPG', 'r')
-    #converto in scala di grigi
-    img_diff_grigio_matrice[count] = core.img_in_matrice(img_diff[count])
+#Carico le immagini
+for folder in range(1,(int(options['sporcNumber'])+1)):
+    for count in range(1,(int(options['imageNumber']))):
+        print('Caricamento immagine ' + str(folder) + '/' + str(count) + prefix + '.jpg')
+        if str_to_bool(options['onlyWebcam']) == True:
+            print(' Attesa per il nuovo scatto')
+            #leggo l'immagine
+            core.scatta_foto(int(count), options, webcam)
+        else:
+            img_diff = Image.open(options['imagePath'] + str(folder) + '/' + str(count) + prefix + '.jpg', 'r')
+            #converto in scala di grigi
+            img_grigio_matrice[folder,count] = core.img_in_matrice(img_diff,options)
+
+#elaboro Immagini
+for count in range(1,(int(options['imageNumber']))):
+    print('Analisi immagine ' + str(count))
     #faccio la differenza
-    differenza[count] = core.crea_differenze(img_riferimento_grigio_matrice, img_diff_grigio_matrice[count])
-    #intensita reset
-    intensita = intensita_reset
-    #cerco di eliminare il rumore
-    for x in range(size_x):
-        for y in range(size_y):
-            if img_diff_grigio_matrice[count][x,y] >= int(options['rumour']):
-                img_diff_grigio_matrice[count][x,y]=0
-            #sommo le intensita
-            intensita[img_diff_grigio_matrice[count][x,y]]+=1
+    img_differenza = core.crea_differenze(img_grigio_matrice[1,count], img_grigio_matrice[2,count])
+    img_differenza = img_differenza[0]
     #salvo l'immagine
-    core.salva_immagine_da_array(differenza[count], options['imagePath'] + str(count) + prefix + '_differenza.JPG')
-    numero += "Numero Sporcamento Differenza " + str(count) + ": " + core.calcola_intensita(intensita) + "\n"
-    indice += "Indice Sporcamento " + str(count) + ": " + core.indice_sporcamento(iniettore_riferimento_pulito, core.calcola_intensita(intensita)) + "\n"
+    if str_to_bool(options['onlyWebcam']) != True:
+        core.salva_immagine_da_array(img_differenza, output_folder + str(count) + prefix + '_differenza.jpg', options)
+    else:
+        core.salva_immagine_da_array(img_differenza, options['imagePath'] + str(count) + prefix + '_differenza.jpg', options)
+#    numero += "Numero Sporcamento Differenza " + str(count) + ": " + core.calcola_intensita(intensita) + "\n"
+#    indice += "Indice Sporcamento " + str(count) + ": " + core.indice_sporcamento(iniettore_riferimento_pulito, core.calcola_intensita(intensita)) + "\n"
 #stampo la roba finale
-print('Numero Iniettore Pulito: ' + iniettore_riferimento_pulito)
+#print('Numero Iniettore Pulito: ' + iniettore_riferimento_pulito)
 print(numero)
 print(indice)
 print("--- %s secondi ---" % round(time.time() - start_time, 2))
