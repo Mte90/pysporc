@@ -31,7 +31,7 @@ class Sporcamento():
 
     def salva_immagine_da_array(img, nome):
         #Salviamo l'immagine convertendo da array a stringa
-        Image.fromstring('L', (img.shape[1], img.shape[0]), img.tostring()).save(nome)
+        Image.frombytes('L', (img.shape[1], img.shape[0]), img.tostring()).save(nome)
         print('  Immagine salvata in ' + nome)
 
     #imhist di matlab
@@ -61,11 +61,10 @@ class Sporcamento():
         return cam
 
     def scatta_foto(number, options, webcam):
-        if str_to_bool(options['onlyWebcam']) == True:
-            if number != 0:
-                sleep(int(options['sleep']))
-            img = webcam.get_image()
-            pygame.image.save(img,options['imagePath'] + str(number) + '_webcam.JPG')
+        if number != 0:
+            sleep(int(options['sleep']))
+        img = webcam.get_image()
+        pygame.image.save(img,options['imagePath'] + str(number) + '_webcam.JPG')
 
 def str_to_bool(s):
     if s == 'True':

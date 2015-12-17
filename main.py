@@ -12,9 +12,11 @@ webcam = prefix = ''
 if str_to_bool(options['onlyWebcam']) == True:
     prefix = '_webcam'
     webcam = core.init_webcam(options)
+    options['imagePath'] += 'webcam/'
 #Leggo l'immagine
 print('Lettura immagine di riferimento')
-core.scatta_foto(0, options, webcam)
+if str_to_bool(options['onlyWebcam']) == True:
+    core.scatta_foto(0, options, webcam)
 img_riferimento = Image.open(options['imagePath'] + '0' + prefix + '.JPG', 'r')
 #Converto in scala di grigi
 img_riferimento_grigio_matrice = core.img_in_matrice(img_riferimento)
@@ -43,7 +45,8 @@ for count in range(1,(int(options['imageNumber']) + 1)):
     if str_to_bool(options['onlyWebcam']) == True:
         print(' Attesa per il nuovo scatto')
     #leggo l'immagine
-    core.scatta_foto(int(count), options, webcam)
+    if str_to_bool(options['onlyWebcam']) == True:
+        core.scatta_foto(int(count), options, webcam)
     img_diff[count] = Image.open(options['imagePath'] + str(count) + prefix + '.JPG', 'r')
     #converto in scala di grigi
     img_diff_grigio_matrice[count] = core.img_in_matrice(img_diff[count])
