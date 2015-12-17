@@ -1,5 +1,5 @@
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageChops
 import pygame.camera, pygame.image
 from time import sleep
 
@@ -24,27 +24,21 @@ class Sporcamento():
         size_y = int(options['imageHeight'])
         img = img.convert('L')
         #prendiamo i dati puri dell'immagine e convertiamola in array in base integer ad 8bit
-        img_matrice = np.asarray(img.getdata(), np.uint8).reshape(img.size[1], img.size[0])
+#       img_matrice = np.asarray(img.getdata(), np.uint8).reshape(size_x, size_y)
+        img_matrice = img
         #cerco di eliminare il rumore
         intensita = Sporcamento.intensita_reset()
-        print('  Pulizia immagine')
-#        for x in range(size_x):
-#            for y in range(size_y):
-#                if img_matrice[x,y] >= int(options['rumour']):
-#                    img_matrice[x,y]=0
-#                #sommo le intensita
-#                intensita[img_matrice[x,y]]+=1
         return img_matrice, intensita
 
     def crea_differenze(colori, grigi):
         print('  Effettuata differenza tra colori e scala di grigi')
-        return np.subtract(colori, grigi)
+        return ImageChops.difference(colori,grigi)
 
     def salva_immagine_da_array(img, nome, options):
         size_x = int(options['imageWidth'])
         size_y = int(options['imageHeight'])
         #Salviamo l'immagine convertendo da array a stringa
-        Image.frombytes('L', (size_x,size_y), img.tostring()).save(nome)
+        Image.frombytes('L', (size_x,size_y), img.tobytes()).save(nome)
         print('  Immagine salvata in ' + nome)
 
     #imhist di matlab
