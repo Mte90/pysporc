@@ -90,7 +90,8 @@ class Sporcamento():
         if number != 0:
             sleep(int(options['sleep']))
         img = webcam.get_image()
-        pygame.image.save(img,options['imagePath'] + str(number) + '_webcam.JPG')
+        pygame.image.save(img,options['imagePath'] + str(number) + '_webcam.jpg')
+        return Image.open(options['imagePath'] + str(number) + '_webcam.jpg', 'r')
 
 def str_to_bool(s):
     if s == 'True':
