@@ -40,7 +40,8 @@ numero = indice = '' + "\n"
 
 for count in range(1,(int(options['imageNumber']) + 1)):
     print('Caricamento immagine ' + str(count) + prefix + '.JPG')
-    print(' Attesa per il nuovo scatto')
+    if str_to_bool(options['onlyWebcam']) == True:
+        print(' Attesa per il nuovo scatto')
     #leggo l'immagine
     core.scatta_foto(int(count), options, webcam)
     img_diff[count] = Image.open(options['imagePath'] + str(count) + prefix + '.JPG', 'r')
